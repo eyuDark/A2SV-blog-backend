@@ -1,7 +1,7 @@
 // middleware/authenticateJWT.js
 
 const jwt = require('jsonwebtoken');
-const { user } = require('../models');
+const { User } = require('../models');
 
 // JWT Authentication Middleware
 const authenticateJWT = (req, res, next) => {
@@ -18,11 +18,11 @@ const authenticateJWT = (req, res, next) => {
 
     try {
       // Fetch the user from the database based on the decoded token (user info)
-      const founduser = await user.findByPk(user.id);
-      if (!founduser) {
-        return res.status(404).json({ message: 'user not found' });
+      const foundUser = await User.findByPk(user.id);
+      if (!foundUser) {
+        return res.status(404).json({ message: 'User not found' });
       }
-      req.user = founduser; // Attach user data to the request object
+      req.user = foundUser; // Attach user data to the request object
       next(); // Proceed to the next middleware or controller
     } catch (error) {
       return res.status(500).json({ message: 'Error verifying user', error: error.message });

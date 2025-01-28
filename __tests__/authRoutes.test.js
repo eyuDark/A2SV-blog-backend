@@ -1,11 +1,11 @@
 // __tests__/authRoutes.test.js
 const request = require('supertest');
 const app = require('../server'); // Make sure the server is correctly exported
-const { user } = require('../models'); // Your user model to interact with the database
+const { User } = require('../models'); // Your User model to interact with the database
 const jwt = require('jsonwebtoken');
 
 // Dummy data for testing
-const testuser = {
+const testUser = {
   username: 'testuser',
   email: 'testuser@example.com',
   password: 'password123',
@@ -15,19 +15,19 @@ let token;
 
 beforeAll(async () => {
   // Creating a test user before running tests
-  await user.create(testuser);
+  await User.create(testUser);
 
   // Logging in the user to get a token for authentication
   const response = await request(app)
     .post('/auth/login')
-    .send({ email: testuser.email, password: testuser.password });
+    .send({ email: testUser.email, password: testUser.password });
 
   token = response.body.token; // Save the token to use in protected routes
 });
 
 afterAll(async () => {
   // Clean up the test user after tests are done
-  await user.destroy({ where: { email: testuser.email } });
+  await User.destroy({ where: { email: testUser.email } });
 });
 
 describe('Auth Routes', () => {
@@ -42,7 +42,7 @@ describe('Auth Routes', () => {
         });
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('message', 'user registered successfully');
+      expect(response.body).toHaveProperty('message', 'User registered successfully');
     });
   });
 
@@ -50,7 +50,7 @@ describe('Auth Routes', () => {
     it('should login an existing user and return a token', async () => {
       const response = await request(app)
         .post('/auth/login')
-        .send({ email: testuser.email, password: testuser.password });
+        .send({ email: testUser.email, password: testUser.password });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('token');
@@ -64,7 +64,7 @@ describe('Auth Routes', () => {
         .set('Authorization', `Bearer ${token}`); // Pass the token for authentication
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('username', testuser.username);
+      expect(response.body).toHaveProperty('username', testUser.username);
     });
 
     it('should return 401 for unauthenticated users', async () => {

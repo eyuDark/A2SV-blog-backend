@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { user } = require('../models');
+const { User } = require('../models');
 
 // Register a new user
 const register = async (req, res) => {
@@ -10,8 +10,8 @@ const register = async (req, res) => {
 
   try {
     // Check if user already exists
-    const existinguser = await user.findOne({ where: { email } });
-    if (existinguser) {
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
       return res.status(400).json({ message: 'Email is already registered' });
     }
 
@@ -19,7 +19,7 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the new user
-    const newuser = await user.create({
+    const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
@@ -28,7 +28,7 @@ const register = async (req, res) => {
       role: 'user', // Default role
     });
 
-    res.status(201).json({ message: 'user registered successfully', user: newuser });
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
     res.status(500).json({ message: 'Error registering user', error: error.message });
   }
@@ -40,19 +40,19 @@ const login = async (req, res) => {
 
   try {
     // Check if user exists
-    const user = await user.findOne({ where: { email } });
-    if (!user) {
+    const foundUser = await User.findOne({ where: { email } });
+    if (!foundUser) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Compare password with hashed password in the database
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, foundUser.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
@@ -76,9 +76,9 @@ const updateProfile = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const user = await user.findByPk(userId);
+    const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ message: 'user not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     user.name = name || user.name;

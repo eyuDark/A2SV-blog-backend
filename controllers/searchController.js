@@ -1,8 +1,9 @@
 // controllers/searchController.js
-const { user, Blog } = require('../models');
+const { User, Blog } = require('../models');
+const { Op } = require('sequelize');
 
 // Search for users by username or name
-exports.searchusers = async (req, res) => {
+exports.searchUsers = async (req, res) => {
   try {
     const { query } = req.query;  // The search query
     if (!query) {
@@ -10,7 +11,7 @@ exports.searchusers = async (req, res) => {
     }
 
     // Search for users by username or name (case-insensitive)
-    const users = await user.findAll({
+    const users = await User.findAll({
       where: {
         [Op.or]: [
           { username: { [Op.iLike]: `%${query}%` } },

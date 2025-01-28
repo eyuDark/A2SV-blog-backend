@@ -1,4 +1,4 @@
-const { Like, Blog, user } = require('../models');
+const { Like, Blog, User } = require('../models');
 
 // Like a blog post
 const likeBlog = async (req, res) => {

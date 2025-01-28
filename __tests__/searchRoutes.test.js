@@ -1,16 +1,16 @@
 // __tests__/searchRoutes.test.js
 const request = require('supertest');
 const app = require('../server'); // Assuming your Express app is exported from server.js
-const { user, Blog } = require('../models'); // Models for interacting with the DB
+const { User, Blog } = require('../models'); // Models for interacting with the DB
 const jwt = require('jsonwebtoken');
 
 let token;
-let testuser;
+let testUser;
 let testBlog;
 
 beforeAll(async () => {
   // Create a test user
-  testuser = await user.create({
+  testUser = await User.create({
     username: 'testuser',
     email: 'testuser@example.com',
     password: 'password123',
@@ -25,7 +25,7 @@ beforeAll(async () => {
 
   // Create a test blog post for testing
   testBlog = await Blog.create({
-    userId: testuser.id,
+    userId: testUser.id,
     title: 'Test Blog Post',
     content: 'This is a test blog post content.',
   });
@@ -34,7 +34,7 @@ beforeAll(async () => {
 afterAll(async () => {
   // Clean up the test data after the tests
   await Blog.destroy({ where: { id: testBlog.id } });
-  await user.destroy({ where: { email: 'testuser@example.com' } });
+  await User.destroy({ where: { email: 'testuser@example.com' } });
 });
 
 describe('Search Routes', () => {

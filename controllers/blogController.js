@@ -1,6 +1,6 @@
 // controllers/blogController.js
 
-const { Blog, BlogRating, Comment, Like, user } = require('../models');
+const { Blog, BlogRating, Comment, Like, User } = require('../models');
 
 // Create a new blog post
 const createBlog = async (req, res) => {
@@ -36,7 +36,7 @@ const getBlogById = async (req, res) => {
 
   try {
     const blog = await Blog.findByPk(id, {
-      include: [user, { model: Comment, include: [user] }]
+      include: [User, { model: Comment, include: [User] }]
     });
 
     if (!blog) {
@@ -234,7 +234,7 @@ const toggleLike = async (req, res) => {
       return res.status(200).json({ message: 'Blog unliked' });
     }
 
-    // If the user hasn’t liked the post, like it
+    // If the user hasn't liked the post, like it
     const newLike = await Like.create({
       blogId: id,
       userId
